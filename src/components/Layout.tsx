@@ -183,7 +183,7 @@ export default function Layout() {
         </main>
 
         <footer className="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} Chi bộ Sinh viên. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Chi bộ Sinh viên - Thiết kế và xây dựng bởi Lê Vĩnh Diện</p>
         </footer>
       </div>
     </div>

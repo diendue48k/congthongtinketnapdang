@@ -11,7 +11,9 @@ import FamilyHistoryForm from '../components/forms/FamilyHistoryForm';
 import OtherInfoForm from '../components/forms/OtherInfoForm';
 import SelfAssessmentForm from '../components/forms/SelfAssessmentForm';
 import PrintableCV from '../components/PrintableCV';
-import { Eye, X } from 'lucide-react';
+import { Eye, X, Download, Loader2 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const STEPS = [
   'Thông tin cơ bản',
@@ -148,6 +150,7 @@ export default function ApplicationForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [showPreview, setShowPreview] = useState(() => {
     const searchParams = new URLSearchParams(location.search);
     return searchParams.get('preview') === 'true';
@@ -186,6 +189,39 @@ export default function ApplicationForm() {
 
     fetchApplication();
   }, [profile, id]);
+
+  const handleDownloadPDF = async () => {
+    const element = document.querySelector('.printable-cv');
+    if (!element) return;
+    
+    setDownloadingPDF(true);
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pages = element.querySelectorAll('.pdf-page');
+      
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i] as HTMLElement;
+        const canvas = await html2canvas(page, { 
+          scale: 2, 
+          useCORS: true,
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        
+        if (i > 0) {
+          pdf.addPage();
+        }
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      }
+      
+      pdf.save(`LyLich_${formData.basicInfo?.fullName?.replace(/\s+/g, '_') || 'DangVien'}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
 
   const handleFeedbackChange = (fieldPath: string, value: string) => {
     setFormData((prev: any) => ({
@@ -563,12 +599,31 @@ export default function ApplicationForm() {
           <div className="bg-gray-100 rounded-xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
               <h3 className="text-lg font-bold text-gray-900">Xem trước Lý lịch (Mẫu 2-KNĐ)</h3>
-              <button 
-                onClick={() => setShowPreview(false)}
-                className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={downloadingPDF}
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-red text-white rounded-lg hover:bg-brand-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                >
+                  {downloadingPDF ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Đang tạo PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Tải file PDF
+                    </>
+                  )}
+                </button>
+                <button 
+                  onClick={() => setShowPreview(false)}
+                  className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-auto p-4 md:p-8 bg-gray-200">
               <PrintableCV data={formData} />
