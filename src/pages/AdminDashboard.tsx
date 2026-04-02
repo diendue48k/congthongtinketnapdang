@@ -126,32 +126,55 @@ export default function AdminDashboard() {
     if (activeTab === 'training') {
       dataToExport = applications
         .filter(app => app.conditions?.hasPartyAwarenessClass === 'false' || app.conditions?.hasPartyAwarenessClass === false)
-        .map(app => ({
-          'Họ và tên': app.basicInfo?.fullName || '',
+        .map((app, index) => ({
+          'STT': index + 1,
           'MSSV': app.basicInfo?.studentId || '',
-          'Lớp': app.basicInfo?.class || '',
-          'Khoa': app.basicInfo?.faculty || '',
-          'Trạng thái hồ sơ': app.status === 'approved' ? 'Đã duyệt' : 
-                              app.status === 'rejected' ? 'Cần sửa' : 
-                              app.status === 'assigned' ? 'Đã phân kiểm tra' :
-                              app.status === 'writing_hardcopy' ? 'Đang viết bản cứng' :
-                              app.status === 'verifying_background' ? 'Đang thẩm tra lý lịch' :
-                              app.status === 'submitted' ? 'Chờ duyệt' : 'Đang soạn'
+          'CCCD': app.basicInfo?.cccd || '',
+          'HỌ VÀ TÊN': app.basicInfo?.fullName || '',
+          'LỚP': app.basicInfo?.class || '',
+          'KHOA': app.basicInfo?.faculty || '',
+          'TÌNH TRẠNG': app.status === 'approved' ? 'Đã duyệt' : 
+                        app.status === 'rejected' ? 'Cần sửa' : 
+                        app.status === 'assigned' ? 'Đã phân kiểm tra' :
+                        app.status === 'writing_hardcopy' ? 'Đang viết bản cứng' :
+                        app.status === 'verifying_background' ? 'Đang thẩm tra lý lịch' :
+                        app.status === 'submitted' ? 'Chờ duyệt' : 'Đang soạn',
+          'ĐV HƯỚNG DẪN': app.assignedToName || '',
+          'NGÀY NHẬN HỒ SƠ': app.createdAt ? new Date(app.createdAt).toLocaleDateString('vi-VN') : '',
+          'NGÀY SINH': app.basicInfo?.dob ? new Date(app.basicInfo.dob).toLocaleDateString('vi-VN') : '',
+          'QUÊ QUÁN': app.basicInfo?.hometown || '',
+          'FACEBOOK': app.basicInfo?.facebookLink || '',
+          'SĐT': app.basicInfo?.zaloPhone || '',
+          'EMAIL': app.basicInfo?.email || '',
+          'GHI CHÚ': 'Chưa học cảm tình Đảng',
+          'Giấy khen, Giấy chứng nhận': (app.conditions?.certificates || []).map((c: any) => c.name).join(', '),
+          'ĐIỂM HỌC TẬP, RÈN LUYỆN': (app.conditions?.academicScores || []).map((s: any) => `Kỳ ${s.semester}: ${s.academicScore}/${s.trainingScore}`).join('; ')
         }));
       filename = 'danh_sach_chua_hoc_cam_tinh_dang.xlsx';
     } else {
-      dataToExport = filteredApplications.map(app => ({
-        'Họ và tên': app.basicInfo?.fullName || '',
+      dataToExport = filteredApplications.map((app, index) => ({
+        'STT': index + 1,
         'MSSV': app.basicInfo?.studentId || '',
-        'Lớp': app.basicInfo?.class || '',
-        'Khoa': app.basicInfo?.faculty || '',
-        'Trạng thái': app.status === 'approved' ? 'Đã duyệt' : 
+        'CCCD': app.basicInfo?.cccd || '',
+        'HỌ VÀ TÊN': app.basicInfo?.fullName || '',
+        'LỚP': app.basicInfo?.class || '',
+        'KHOA': app.basicInfo?.faculty || '',
+        'TÌNH TRẠNG': app.status === 'approved' ? 'Đã duyệt' : 
                       app.status === 'rejected' ? 'Cần sửa' : 
                       app.status === 'assigned' ? 'Đã phân kiểm tra' :
                       app.status === 'writing_hardcopy' ? 'Đang viết bản cứng' :
                       app.status === 'verifying_background' ? 'Đang thẩm tra lý lịch' :
                       app.status === 'submitted' ? 'Chưa duyệt' : 'Đang soạn',
-        'Ngày cập nhật': app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : ''
+        'ĐV HƯỚNG DẪN': app.assignedToName || '',
+        'NGÀY NHẬN HỒ SƠ': app.createdAt ? new Date(app.createdAt).toLocaleDateString('vi-VN') : '',
+        'NGÀY SINH': app.basicInfo?.dob ? new Date(app.basicInfo.dob).toLocaleDateString('vi-VN') : '',
+        'QUÊ QUÁN': app.basicInfo?.hometown || '',
+        'FACEBOOK': app.basicInfo?.facebookLink || '',
+        'SĐT': app.basicInfo?.zaloPhone || '',
+        'EMAIL': app.basicInfo?.email || '',
+        'GHI CHÚ': (app.conditions?.hasPartyAwarenessClass === 'true' || app.conditions?.hasPartyAwarenessClass === true) ? 'Đã học cảm tình Đảng' : 'Chưa học cảm tình Đảng',
+        'Giấy khen, Giấy chứng nhận': (app.conditions?.certificates || []).map((c: any) => c.name).join(', '),
+        'ĐIỂM HỌC TẬP, RÈN LUYỆN': (app.conditions?.academicScores || []).map((s: any) => `Kỳ ${s.semester}: ${s.academicScore}/${s.trainingScore}`).join('; ')
       }));
       filename = 'danh_sach_ho_so.xlsx';
     }
@@ -331,19 +354,32 @@ export default function AdminDashboard() {
                   className="w-full pl-6 pr-2 py-1 bg-gray-50 border border-gray-100 rounded text-[9px] focus:ring-brand-red focus:border-brand-red transition-all"
                 />
               </div>
-              <select 
-                className="bg-gray-50 border border-gray-100 rounded text-[9px] py-1 px-1 font-bold text-gray-700 focus:ring-brand-red focus:border-brand-red transition-all"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="all">Tất cả trạng thái</option>
-                <option value="submitted">Chưa duyệt</option>
-                <option value="assigned">Đã phân kiểm tra</option>
-                <option value="approved">Đã duyệt</option>
-                <option value="rejected">Cần sửa</option>
-                <option value="writing_hardcopy">Đang viết bản cứng</option>
-                <option value="verifying_background">Đang thẩm tra lý lịch</option>
-              </select>
+            </div>
+          </div>
+          
+          <div className="px-3 py-2 border-b border-gray-50 bg-gray-50/30 overflow-x-auto">
+            <div className="flex gap-2 min-w-max">
+              {[
+                { id: 'all', label: 'Tất cả' },
+                { id: 'submitted', label: 'Chưa duyệt' },
+                { id: 'assigned', label: 'Đã phân kiểm tra' },
+                { id: 'approved', label: 'Đã duyệt' },
+                { id: 'rejected', label: 'Cần sửa' },
+                { id: 'writing_hardcopy', label: 'Đang viết bản cứng' },
+                { id: 'verifying_background', label: 'Đang thẩm tra lý lịch' }
+              ].map(status => (
+                <button
+                  key={status.id}
+                  onClick={() => setFilterStatus(status.id)}
+                  className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all whitespace-nowrap ${
+                    filterStatus === status.id 
+                      ? 'bg-brand-red text-white shadow-sm' 
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {status.label}
+                </button>
+              ))}
             </div>
           </div>
           
@@ -372,22 +408,22 @@ export default function AdminDashboard() {
                   filteredApplications.map((app) => (
                     <tr key={app.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-2 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded bg-brand-red/5 text-brand-red flex items-center justify-center font-bold text-[8px]">
+                        <Link to={`/application/${app.id}`} className="flex items-center gap-1.5 group cursor-pointer">
+                          <div className="w-5 h-5 rounded bg-brand-red/5 text-brand-red flex items-center justify-center font-bold text-[8px] group-hover:bg-brand-red group-hover:text-white transition-colors">
                             {(app.basicInfo?.fullName || 'S')[0]}
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-gray-900">{app.basicInfo?.fullName || 'Chưa cập nhật'}</p>
+                            <p className="text-[9px] font-bold text-gray-900 group-hover:text-brand-red transition-colors">{app.basicInfo?.fullName || 'Chưa cập nhật'}</p>
                             <p className="text-[8px] text-gray-500">{app.basicInfo?.studentId || 'N/A'}</p>
                           </div>
-                        </div>
+                        </Link>
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap">
                         <p className="text-[9px] text-gray-700 font-medium">{app.basicInfo?.class || 'N/A'}</p>
                         <p className="text-[8px] text-gray-500">{app.basicInfo?.faculty || 'N/A'}</p>
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap text-[8px] text-gray-500 font-medium">
-                        {app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : 'N/A'}
+                        {app.updatedAt ? new Date(app.updatedAt).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A'}
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap">
                         <span className={`px-1 py-0.5 inline-flex text-[7px] leading-3 font-black uppercase tracking-wider rounded border
