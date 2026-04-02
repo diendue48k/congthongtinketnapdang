@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { handleFirestoreError, OperationType } from '../utils/firestoreError';
@@ -12,7 +12,10 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
   const [adminEmails, setAdminEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const activeTab = searchParams.get('tab') || 'dashboard';
   
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminName, setNewAdminName] = useState('');
@@ -123,8 +126,7 @@ export default function AdminDashboard() {
     if (activeTab === 'training') {
       dataToExport = applications
         .filter(app => app.conditions?.hasPartyAwarenessClass === 'false' || app.conditions?.hasPartyAwarenessClass === false)
-        .map((app, index) => ({
-          'STT': index + 1,
+        .map(app => ({
           'Họ và tên': app.basicInfo?.fullName || '',
           'MSSV': app.basicInfo?.studentId || '',
           'Lớp': app.basicInfo?.class || '',
@@ -138,30 +140,18 @@ export default function AdminDashboard() {
         }));
       filename = 'danh_sach_chua_hoc_cam_tinh_dang.xlsx';
     } else {
-      dataToExport = filteredApplications.map((app, index) => ({
-        'STT': index + 1,
+      dataToExport = filteredApplications.map(app => ({
+        'Họ và tên': app.basicInfo?.fullName || '',
         'MSSV': app.basicInfo?.studentId || '',
-        'CCCD': app.basicInfo?.cccd || '',
-        'HỌ VÀ TÊN': app.basicInfo?.fullName || '',
-        'LỚP': app.basicInfo?.class || '',
-        'KHOA': app.basicInfo?.faculty || '',
-        'TÌNH TRẠNG': app.status === 'approved' ? 'Đã duyệt' : 
+        'Lớp': app.basicInfo?.class || '',
+        'Khoa': app.basicInfo?.faculty || '',
+        'Trạng thái': app.status === 'approved' ? 'Đã duyệt' : 
                       app.status === 'rejected' ? 'Cần sửa' : 
                       app.status === 'assigned' ? 'Đã phân kiểm tra' :
                       app.status === 'writing_hardcopy' ? 'Đang viết bản cứng' :
                       app.status === 'verifying_background' ? 'Đang thẩm tra lý lịch' :
                       app.status === 'submitted' ? 'Chưa duyệt' : 'Đang soạn',
-        'ĐV HƯỚNG DẪN': app.assignedToName || '',
-        'NGÀY NHẬN HỒ SƠ': app.createdAt ? new Date(app.createdAt).toLocaleDateString('vi-VN') : (app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : ''),
-        'NGÀY SINH': app.basicInfo?.dob ? new Date(app.basicInfo.dob).toLocaleDateString('vi-VN') : '',
-        'QUÊ QUÁN': app.basicInfo?.hometown || '',
-        'FACEBOOK': app.basicInfo?.facebookLink || '',
-        'SĐT': app.basicInfo?.zaloPhone || '',
-        'EMAIL': app.basicInfo?.email || '',
-        'GHI CHÚ': (app.conditions?.hasPartyAwarenessClass === 'false' || app.conditions?.hasPartyAwarenessClass === false) ? 'Chưa học cảm tình Đảng' : 'Đã học cảm tình Đảng',
-        'Giấy khen, Giấy chứng nhận': Array.isArray(app.conditions?.certificates) ? app.conditions.certificates.map((c: any) => c.name).filter(Boolean).join(', ') : '',
-        'ĐIỂM HỌC TẬP': Array.isArray(app.conditions?.academicScores) ? app.conditions.academicScores.map((s: any) => s.academicScore).filter(Boolean).join(', ') : '',
-        'ĐIỂM RÈN LUYỆN': Array.isArray(app.conditions?.academicScores) ? app.conditions.academicScores.map((s: any) => s.trainingScore).filter(Boolean).join(', ') : ''
+        'Ngày cập nhật': app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : ''
       }));
       filename = 'danh_sach_ho_so.xlsx';
     }
@@ -214,31 +204,6 @@ export default function AdminDashboard() {
             Xuất báo cáo
           </button>
         </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="bg-white p-1 rounded-lg border border-gray-100 shadow-sm mb-4 inline-flex flex-wrap gap-1">
-        {[
-          { id: 'dashboard', label: 'Tổng quan', icon: FileText },
-          { id: 'applications', label: 'Hồ sơ', icon: FileText },
-          { id: 'training', label: 'Chưa học cảm tình', icon: BookOpen },
-          { id: 'users', label: 'Đảng viên', icon: UserPlus },
-          { id: 'permissions', label: 'Phân công', icon: Shield },
-          { id: 'settings', label: 'Cấu hình', icon: Settings },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[10px] font-bold transition-all ${
-              activeTab === tab.id
-                ? 'bg-brand-red text-white shadow-sm shadow-red-100'
-                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-            }`}
-          >
-            <tab.icon size={12} />
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {activeTab === 'dashboard' && (
@@ -386,31 +351,17 @@ export default function AdminDashboard() {
             <table className="min-w-full divide-y divide-gray-100">
               <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">STT</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">MSSV</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">CCCD</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Họ và tên</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Lớp</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Khoa</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Tình trạng</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">ĐV Hướng dẫn</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Ngày nhận hồ sơ</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Ngày sinh</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Quê quán</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Facebook</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">SĐT</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Email</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Ghi chú (Cảm tình Đảng)</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Giấy khen, Chứng nhận</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Điểm học tập</th>
-                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Điểm rèn luyện</th>
-                  <th className="px-3 py-1.5 text-right text-[8px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-gray-50/50">Thao tác</th>
+                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider">Sinh viên</th>
+                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider">Thông tin học tập</th>
+                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider">Ngày cập nhật</th>
+                  <th className="px-3 py-1.5 text-left text-[8px] font-bold text-gray-400 uppercase tracking-wider">Trạng thái</th>
+                  <th className="px-3 py-1.5 text-right text-[8px] font-bold text-gray-400 uppercase tracking-wider">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-50">
                 {filteredApplications.length === 0 ? (
                   <tr>
-                    <td colSpan={19} className="px-3 py-4 text-center text-gray-500 font-medium text-[9px]">
+                    <td colSpan={5} className="px-3 py-4 text-center text-gray-500 font-medium text-[9px]">
                       <div className="flex flex-col items-center gap-1">
                         <FileText size={16} className="text-gray-200" />
                         Chưa có hồ sơ nào phù hợp
@@ -418,14 +369,26 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ) : (
-                  filteredApplications.map((app, index) => (
+                  filteredApplications.map((app) => (
                     <tr key={app.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{index + 1}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-900 font-medium">{app.basicInfo?.studentId || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{app.basicInfo?.cccd || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] font-bold text-gray-900">{app.basicInfo?.fullName || 'Chưa cập nhật'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-700">{app.basicInfo?.class || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{app.basicInfo?.faculty || 'N/A'}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-5 h-5 rounded bg-brand-red/5 text-brand-red flex items-center justify-center font-bold text-[8px]">
+                            {(app.basicInfo?.fullName || 'S')[0]}
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-bold text-gray-900">{app.basicInfo?.fullName || 'Chưa cập nhật'}</p>
+                            <p className="text-[8px] text-gray-500">{app.basicInfo?.studentId || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <p className="text-[9px] text-gray-700 font-medium">{app.basicInfo?.class || 'N/A'}</p>
+                        <p className="text-[8px] text-gray-500">{app.basicInfo?.faculty || 'N/A'}</p>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap text-[8px] text-gray-500 font-medium">
+                        {app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : 'N/A'}
+                      </td>
                       <td className="px-3 py-2 whitespace-nowrap">
                         <span className={`px-1 py-0.5 inline-flex text-[7px] leading-3 font-black uppercase tracking-wider rounded border
                           ${app.status === 'approved' ? 'bg-green-50 text-green-700 border-green-100' : 
@@ -444,36 +407,7 @@ export default function AdminDashboard() {
                            'Đang soạn'}
                         </span>
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-700">{app.assignedToName || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[8px] text-gray-500 font-medium">
-                        {app.createdAt ? new Date(app.createdAt).toLocaleDateString('vi-VN') : (app.updatedAt ? new Date(app.updatedAt).toLocaleDateString('vi-VN') : 'N/A')}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{app.basicInfo?.dob ? new Date(app.basicInfo.dob).toLocaleDateString('vi-VN') : 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500 max-w-[150px] truncate" title={app.basicInfo?.hometown}>{app.basicInfo?.hometown || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-blue-500 hover:underline">
-                        {app.basicInfo?.facebookLink ? (
-                          <a href={app.basicInfo.facebookLink} target="_blank" rel="noopener noreferrer">Link</a>
-                        ) : 'N/A'}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{app.basicInfo?.zaloPhone || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">{app.basicInfo?.email || 'N/A'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] font-medium">
-                        {(app.conditions?.hasPartyAwarenessClass === 'false' || app.conditions?.hasPartyAwarenessClass === false) ? (
-                          <span className="text-red-600">Chưa học</span>
-                        ) : (
-                          <span className="text-green-600">Đã học</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500 max-w-[150px] truncate" title={Array.isArray(app.conditions?.certificates) ? app.conditions.certificates.map((c: any) => c.name).filter(Boolean).join(', ') : ''}>
-                        {Array.isArray(app.conditions?.certificates) && app.conditions.certificates.length > 0 ? app.conditions.certificates.map((c: any) => c.name).filter(Boolean).join(', ') : 'N/A'}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">
-                        {Array.isArray(app.conditions?.academicScores) ? app.conditions.academicScores.map((s: any) => s.academicScore).filter(Boolean).join(', ') : 'N/A'}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-[9px] text-gray-500">
-                        {Array.isArray(app.conditions?.academicScores) ? app.conditions.academicScores.map((s: any) => s.trainingScore).filter(Boolean).join(', ') : 'N/A'}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-right text-[9px] font-medium sticky right-0 bg-white">
+                      <td className="px-3 py-2 whitespace-nowrap text-right text-[9px] font-medium">
                         <div className="flex items-center justify-end gap-1">
                           <select 
                             className="bg-white border border-gray-200 rounded text-[8px] py-0.5 px-1 font-bold text-gray-700 focus:ring-brand-red focus:border-brand-red transition-all"
