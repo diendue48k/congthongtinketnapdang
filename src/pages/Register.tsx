@@ -52,7 +52,10 @@ export default function Register() {
       const querySnapshot = await getDocs(q);
       const isInvitedAdmin = !querySnapshot.empty;
 
-      const isAdmin = isInvitedAdmin || email.toLowerCase() === 'levinhdienthptbenhai@gmail.com';
+      const isAdmin = isInvitedAdmin || 
+        email.toLowerCase() === 'levinhdienthptbenhai@gmail.com' ||
+        email.toLowerCase() === 'levinhdienqt123@gmail.com' ||
+        email.toLowerCase() === 'levinhdien9bthcschuvanan@gmail.com';
 
       // Create user profile
       const userProfile = {
@@ -218,7 +221,7 @@ export default function Register() {
 
       {/* Footer */}
       <footer className="bg-[#c62828] text-white/90 py-5 text-center text-sm font-medium tracking-wide">
-        © 2025 Bản quyền thuộc về Chi bộ Sinh viên
+        © 2026 Bản quyền thuộc về Chi bộ Sinh viên
       </footer>
     </div>
   );
