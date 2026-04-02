@@ -33,30 +33,36 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
   };
 
   const renderDottedLine = (label: string, value: string, className = "") => (
-    <div className={`flex items-end gap-1 mb-1 ${className}`}>
-      <span className="whitespace-nowrap font-medium text-[13pt]" style={{ color: '#000' }}>{label}:</span>
-      <div className="flex-grow border-b border-dotted min-h-[1.2rem] flex items-end px-1" style={{ borderColor: '#000' }}>
-        <span className="text-[13pt] leading-none text-red-600">{value || ''}</span>
-      </div>
-    </div>
+    <table className={`w-full mb-1 ${className}`} style={{ borderCollapse: 'collapse', border: 'none' }}>
+      <tbody>
+        <tr>
+          <td style={{ width: '1%', whiteSpace: 'nowrap', border: 'none', padding: '0 4px 0 0', verticalAlign: 'bottom' }}>
+            <span className="font-medium text-[11pt]" style={{ color: '#111827' }}>{label}:</span>
+          </td>
+          <td style={{ border: 'none', borderBottom: '1px dotted #4b5563', padding: '0 4px', verticalAlign: 'bottom' }}>
+            <span className="text-[11pt]" style={{ color: '#111827' }}>{value || ''}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   );
 
   const renderEmptyLines = (count: number) => {
     return Array.from({ length: count }).map((_, i) => (
-      <div key={i} className="border-b border-dotted border-black h-8 w-full mb-2"></div>
+      <div key={i} className="border-b border-dotted border-gray-500 h-8 w-full mb-2"></div>
     ));
   };
 
-  const PageWrapper: React.FC<{ children: React.ReactNode, pageNum: number, showPageNum?: boolean, actualPageNum?: number }> = ({ children, pageNum, showPageNum = true, actualPageNum }) => (
+  const PageWrapper: React.FC<{ children: React.ReactNode, pageNum: number, showPageNum?: boolean }> = ({ children, pageNum, showPageNum = true }) => (
     <div 
       className="pdf-page mx-auto mb-4 relative bg-white" 
       id={`page-${pageNum}`} 
       style={{ 
-        padding: '2cm 1.5cm 2cm 2cm',
+        padding: '1.5cm',
         width: '210mm',
         minHeight: '297mm',
-        fontSize: '13pt',
-        lineHeight: '1.5',
+        fontSize: '11pt',
+        lineHeight: '1.6',
         fontFamily: '"Times New Roman", Times, serif',
         color: '#000',
         boxSizing: 'border-box',
@@ -64,7 +70,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
       }}
     >
       {children}
-      {showPageNum && <div className="absolute bottom-8 left-0 w-full text-center text-sm">{actualPageNum !== undefined ? actualPageNum : pageNum}</div>}
+      {showPageNum && <div className="absolute bottom-8 left-0 w-full text-center text-sm">{pageNum}</div>}
     </div>
   );
 
@@ -72,36 +78,37 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
     <div className="printable-cv py-10 overflow-auto bg-gray-200 flex flex-col items-center">
       {/* Page 1: Cover */}
       <PageWrapper pageNum={1} showPageNum={false}>
-        <div className="h-full p-10 flex flex-col items-center justify-between" style={{ border: '4px double #000', minHeight: '250mm' }}>
+        <div className="p-10 text-center" style={{ border: '4px double #000', minHeight: '260mm' }}>
           <div className="text-center w-full">
             <p className="text-right text-sm font-bold mb-10">Mẫu 2-KNĐ</p>
             <h2 className="text-xl font-bold uppercase mb-2 tracking-widest">ĐẢNG CỘNG SẢN VIỆT NAM</h2>
-            <div className="w-40 h-[1px] mx-auto mb-20 bg-black"></div>
+            <div className="w-20 h-[1px] mx-auto mb-20 bg-black"></div>
             
-            <div className="my-20">
+            <div className="my-20" style={{ marginTop: '80px', marginBottom: '80px' }}>
               <h1 className="text-5xl font-bold mb-6 tracking-tighter">LÝ LỊCH</h1>
               <h2 className="text-2xl font-bold uppercase tracking-widest">CỦA NGƯỜI XIN VÀO ĐẢNG</h2>
             </div>
           </div>
 
-          <div className="w-full max-w-lg space-y-6 mb-20">
+          <div className="w-full max-w-md mx-auto space-y-8 mb-20 text-left" style={{ marginBottom: '80px' }}>
             {renderDottedLine("Họ và tên khai sinh", basicInfo.fullName?.toUpperCase())}
             {renderDottedLine("Họ và tên thường dùng", basicInfo.aliases)}
             {renderDottedLine("Ngày sinh", safeFormatDate(basicInfo.dob))}
             {renderDottedLine("Quê quán", basicInfo.hometown)}
-            <p className="text-sm font-bold mt-2 uppercase">(TRƯỚC ĐÂY LÀ {basicInfo.hometown})</p>
           </div>
 
           <div className="w-full text-right pr-10 mb-10">
-            {renderDottedLine("Số lý lịch", "", "w-64 ml-auto")}
+            <div className="inline-block w-64 ml-auto text-left">
+              {renderDottedLine("Số lý lịch", "")}
+            </div>
           </div>
         </div>
       </PageWrapper>
 
       {/* Page 2: Instructions 1 */}
       <PageWrapper pageNum={2} showPageNum={false}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-4">QUY ĐỊNH VỀ VIỆC VIẾT ĐƠN XIN VÀO ĐẢNG,<br/>KHAI VÀ CHỨNG NHẬN LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG</h2>
-        <div className="text-justify space-y-1">
+        <h2 className="text-lg font-bold uppercase text-center mb-4">QUY ĐỊNH VỀ VIỆC VIẾT ĐƠN XIN VÀO ĐẢNG,<br/>KHAI VÀ CHỨNG NHẬN LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG</h2>
+        <div className="text-justify space-y-2">
           <p className="font-bold">I. Đơn xin vào Đảng</p>
           <p>Người vào Đảng phải tự làm đơn, trình bày rõ những nhận thức của mình về mục đích, lý tưởng của Đảng, về động cơ xin vào Đảng.</p>
           <p className="font-bold">II. Khai và chứng nhận lý lịch của người xin vào Đảng (Mẫu 2 - KNĐ)</p>
@@ -124,7 +131,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 3: Instructions 2 */}
       <PageWrapper pageNum={3} showPageNum={false}>
-        <div className="text-justify space-y-1">
+        <div className="text-justify space-y-2">
           <p>của bố, mẹ là người nước ngoài).</p>
           <p>(9) <b>Tôn giáo:</b> Theo tôn giáo nào thì ghi rõ (ví dụ: đạo Phật, Công giáo, đạo Hồi, đạo Cao Đài, đạo Hòa Hảo... ghi cả chức sắc trong tôn giáo - nếu có), nếu không theo tôn giáo nào thì ghi chữ “không”.</p>
           <p>(10) <b>Nghề nghiệp hiện nay:</b> Ghi rõ công việc chính đang làm theo hợp đồng lao động hoặc quyết định, tuyển dụng, phân công, bổ nhiệm... Ví dụ: công nhân, nông dân, công chức, viên chức, bác sỹ ngoại khoa, bộ đội, nhà văn, nhà báo, chủ doanh nghiệp, học sinh, sinh viên hoặc chưa có việc làm.</p>
@@ -144,7 +151,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 4: Instructions 3 */}
       <PageWrapper pageNum={4} showPageNum={false}>
-        <div className="text-justify space-y-1">
+        <div className="text-justify space-y-2">
           <p>sở, đoàn cấp trên trực tiếp cơ sở, đoàn cấp tỉnh).</p>
           <p>(13) <b>Đối với người xin được kết nạp lại vào Đảng:</b></p>
           <p>- Ngày và nơi kết nạp vào Đảng Cộng sản Việt Nam lần thứ nhất: Ghi rõ ngày, tháng, năm và nơi kết nạp vào Đảng (chi bộ, đảng bộ cơ sở, đảng bộ cấp trên trực tiếp của tổ chức cơ sở đảng, đảng bộ trực thuộc Trung ương).</p>
@@ -160,7 +167,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 5: Instructions 4 */}
       <PageWrapper pageNum={5} showPageNum={false}>
-        <div className="text-justify space-y-1">
+        <div className="text-justify space-y-2">
           <p>cấp nào mở, tên trường, thời gian học, ở đâu; học chính quy hay tại chức; tên văn bằng hoặc chứng chỉ được cấp.</p>
           <p>(18) <b>Đi nước ngoài:</b> Ghi rõ thời gian từ tháng năm nào đến tháng năm nào, đi nước nào; cơ quan, đơn vị, tổ chức nào quyết định (chỉ ghi các trường hợp đi học tập, lao động hợp tác, công tác...<b>từ 3 tháng trở lên</b>).</p>
           <p>(19) <b>Khen thưởng:</b> Ghi rõ tháng năm, hình thức được khen thưởng <b>từ bằng khen trở lên</b> hoặc hình thức khen thưởng cao nhất, cấp nào quyết định; các danh hiệu được Nhà nước phong tặng: Anh hùng lao động, Anh hùng lực lượng vũ trang, Thầy thuốc nhân dân, Nhà giáo nhân dân, Nghệ sỹ nhân dân, Nghệ nhân nhân dân, Thầy thuốc ưu tú, Nhà giáo ưu tú, Nghệ sỹ ưu tú, Nghệ nhân ưu tú...</p>
@@ -175,7 +182,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 6: Instructions 5 */}
       <PageWrapper pageNum={6} showPageNum={false}>
-        <div className="text-justify space-y-1">
+        <div className="text-justify space-y-2">
           <p>đế quốc hoặc chế độ cũ; hiện nay, những người đó làm gì? Ở đâu? Nếu đã chết thì ghi rõ lý do chết, năm nào? Tại đâu?</p>
           <p>- Anh chị em ruột của bản thân, của vợ (hoặc chồng); các con bao gồm con đẻ, con nuôi có đăng ký hợp pháp: Ghi rõ họ tên, năm sinh, quốc tịch, nơi cư trú, nghề nghiệp, hoàn cảnh, kinh tế, việc chấp hành đường lối, chủ trương của Đảng, chính sách, pháp luật của Nhà nước, tiền án (nếu có) của từng người.</p>
           <p>(22) <b>Tự nhận xét:</b> Ghi những ưu, khuyết điểm chính của bản thân về các mặt phẩm chất chính trị, đạo đức lối sống, năng lực công tác và quan hệ quần chúng; sự tín nhiệm của quần chúng và đảng viên ở đơn vị công tác, làm việc đối với bản thân như thế nào?</p>
@@ -191,7 +198,7 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 7: Instructions 6 */}
       <PageWrapper pageNum={7} showPageNum={false}>
-        <div className="text-justify space-y-1">
+        <div className="text-justify space-y-2">
           <p>mặt thường trực cấp ủy hoặc lãnh đạo cơ quan tham mưu về công tác tổ chức xác nhận, ký tên, ghi rõ chức vụ, đóng dấu của cấp ủy hoặc cơ quan tham mưu về công tác tổ chức.</p>
           <p>(25) <b>Nhận xét của chi ủy hoặc của chi bộ (nơi không có chi ủy):</b></p>
           <p>Sau khi có kết quả thẩm tra, xác minh lý lịch của người xin vào Đảng, chi bộ nhận xét, bí thư hoặc phó bí thư ghi rõ bản lý lịch đã khai đúng sự thật chưa? Không đúng ở điểm nào? Có vấn đề về lịch sử chính trị và chính trị hiện nay không? Quan điểm, lập trường, phẩm chất đạo đức, lối sống và quan hệ quần chúng... của người xin vào Đảng?</p>
@@ -202,99 +209,124 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
       </PageWrapper>
 
       {/* Page 8: Sơ lược lý lịch */}
-      <PageWrapper pageNum={8} actualPageNum={1}>
-        <div className="flex justify-between items-start mb-4">
+      <PageWrapper pageNum={8}>
+        <div className="flex justify-between items-start mb-10">
           <div className="w-[3cm] h-[4cm] border border-black flex items-center justify-center text-xs">
             {basicInfo.profilePhotoUrl ? (
               <img src={basicInfo.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             ) : (
-              <div className="text-center">Ảnh<br/>(3x4)</div>
+              "Ảnh (3x4)"
             )}
           </div>
           <h2 className="text-2xl font-bold uppercase mt-10">SƠ LƯỢC LÝ LỊCH</h2>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           {renderDottedLine("(1) Họ và tên khai sinh", basicInfo.fullName?.toUpperCase())}
           {renderDottedLine("(2) Các tên gọi khác", basicInfo.aliases)}
-          <div className="flex gap-4">
-            <div className="flex-grow">{renderDottedLine("(3) Sinh ngày", safeFormatDate(basicInfo.dob))}</div>
-            <div className="w-1/2">{renderDottedLine("Số căn cước", basicInfo.cccd)}</div>
-          </div>
+          <table className="w-full mb-1" style={{ borderCollapse: 'collapse', border: 'none' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', border: 'none', padding: '0 8px 0 0', verticalAlign: 'bottom' }}>
+                  {renderDottedLine("(3) Sinh ngày", safeFormatDate(basicInfo.dob))}
+                </td>
+                <td style={{ width: '50%', border: 'none', padding: '0 0 0 8px', verticalAlign: 'bottom' }}>
+                  {renderDottedLine("Số căn cước", basicInfo.cccd)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
           {renderDottedLine("(4) Giới tính (nam, nữ)", basicInfo.gender)}
           {renderDottedLine("(5) Nơi đăng ký khai sinh", basicInfo.birthplace)}
           {renderDottedLine("(6) Quê quán", basicInfo.hometown)}
           
-          <div className="mt-2">
-            <p className="mb-1">(7) Nơi cư trú:</p>
-            {renderDottedLine("- Nơi thường trú", basicInfo.permanentAddress, "pl-2")}
-            {renderDottedLine("- Nơi tạm trú", basicInfo.temporaryAddress, "pl-2")}
+          <div className="mt-4">
+            <p className="font-medium mb-1">(7) Nơi cư trú:</p>
+            {renderDottedLine("- Nơi thường trú", basicInfo.permanentAddress, "pl-4")}
+            {renderDottedLine("- Nơi tạm trú", basicInfo.temporaryAddress, "pl-4")}
           </div>
 
-          <div className="flex gap-4">
-            <div className="flex-grow">{renderDottedLine("(8) Dân tộc", basicInfo.ethnicity)}</div>
-            <div className="w-1/2">{renderDottedLine("Quốc tịch", basicInfo.nationality)}</div>
-          </div>
+          <table className="w-full mb-1" style={{ borderCollapse: 'collapse', border: 'none' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', border: 'none', padding: '0 8px 0 0', verticalAlign: 'bottom' }}>
+                  {renderDottedLine("(8) Dân tộc", basicInfo.ethnicity)}
+                </td>
+                <td style={{ width: '50%', border: 'none', padding: '0 0 0 8px', verticalAlign: 'bottom' }}>
+                  {renderDottedLine("Quốc tịch", basicInfo.nationality)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
           {renderDottedLine("(9) Tôn giáo", basicInfo.religion)}
           
-          <div className="mt-2">
-            <p className="mb-1">(10) Nghề nghiệp hiện nay:</p>
-            {renderDottedLine("- Giáo dục phổ thông", basicInfo.generalEducation, "pl-2")}
-            {renderDottedLine("- Chuyên môn nghiệp vụ", basicInfo.professionalExpertise, "pl-2")}
-            {renderDottedLine("- Khoa học công nghệ", basicInfo.scienceTech, "pl-2")}
-            {renderDottedLine("- Học vị cao nhất", basicInfo.highestDegree, "pl-2")}
-            {renderDottedLine("- Học hàm cao nhất", basicInfo.highestTitle, "pl-2")}
-            {renderDottedLine("- Lý luận chính trị", basicInfo.politicalTheory, "pl-2")}
-            {renderDottedLine("- Ngoại ngữ", basicInfo.foreignLanguage, "pl-2")}
-            {renderDottedLine("- Tin học", basicInfo.itSkill, "pl-2")}
-            {renderDottedLine("- Tiếng dân tộc thiểu số", basicInfo.minorityLanguage, "pl-2")}
+          <div className="mt-4">
+            <p className="font-medium mb-1">(10) Nghề nghiệp hiện nay:</p>
+            {renderDottedLine("- Giáo dục phổ thông", basicInfo.generalEducation, "pl-4")}
+            {renderDottedLine("- Chuyên môn nghiệp vụ", basicInfo.professionalExpertise, "pl-4")}
+            {renderDottedLine("- Khoa học công nghệ", basicInfo.scienceTech, "pl-4")}
+            {renderDottedLine("- Học vị cao nhất", basicInfo.highestDegree, "pl-4")}
+            {renderDottedLine("- Học hàm cao nhất", basicInfo.highestTitle, "pl-4")}
+            {renderDottedLine("- Lý luận chính trị", basicInfo.politicalTheory, "pl-4")}
+            {renderDottedLine("- Ngoại ngữ", basicInfo.foreignLanguage, "pl-4")}
+            {renderDottedLine("- Tin học", basicInfo.itSkill, "pl-4")}
+            {renderDottedLine("- Tiếng dân tộc thiểu số", basicInfo.minorityLanguage, "pl-4")}
           </div>
 
-          {renderDottedLine("(12) Ngày và nơi kết nạp vào Đoàn TNCSHCM", `${basicInfo.youthUnionJoinDate || ''} tại ${basicInfo.youthUnionJoinPlace || ''}`)}
+          {renderDottedLine("(12) Ngày và nơi kết nạp vào Đoàn TNCSHCM", `${basicInfo.youthUnionJoinDate || ''} - ${basicInfo.youthUnionJoinPlace || ''}`)}
           
-          <div className="mt-2">
-            <p className="mb-1">(13) Đối với người xin được kết nạp lại vào Đảng:</p>
-            {renderDottedLine("- Ngày và nơi kết nạp vào Đảng CSVN lần thứ nhất", basicInfo.firstAdmissionDate, "pl-2")}
-            {renderDottedLine("- Ngày và nơi công nhận chính thức lần thứ nhất", basicInfo.firstOfficialDate, "pl-2")}
-            {renderDottedLine("- Người giới thiệu vào Đảng lần thứ nhất", basicInfo.firstIntroducer, "pl-2")}
+          <div className="mt-4">
+            <p className="font-medium mb-1">(13) Đối với người xin được kết nạp lại vào Đảng:</p>
+            {renderDottedLine("- Ngày và nơi kết nạp vào Đảng CSVN lần thứ nhất", basicInfo.firstAdmissionDate, "pl-4")}
+            {renderDottedLine("- Ngày và nơi công nhận chính thức lần thứ nhất", basicInfo.firstOfficialDate, "pl-4")}
+            {renderDottedLine("- Người giới thiệu vào Đảng lần thứ nhất", basicInfo.firstIntroducer, "pl-4")}
           </div>
         </div>
       </PageWrapper>
 
-      {/* Page 9: Lịch sử bản thân */}
-      <PageWrapper pageNum={9} actualPageNum={2}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(14) LỊCH SỬ BẢN THÂN</h2>
-        <div className="whitespace-pre-wrap text-justify leading-loose text-red-600">
+      {/* Page 9: Lịch sử bản thân 1 */}
+      <PageWrapper pageNum={9}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(14) LỊCH SỬ BẢN THÂN</h2>
+        <div className="whitespace-pre-wrap text-justify leading-loose">
           {history?.map((h: any, i: number) => (
             <p key={i} className="mb-2">
-              {h.timeRange}: {h.description}
+              <span className="font-bold">{h.timeRange}:</span> {h.description}
             </p>
           ))}
           {personalHistory.currentResidence && (
             <p className="mt-4">
-              Hiện đang tạm trú tại: {personalHistory.currentResidence}
+              <span className="font-bold">Hiện đang cư trú/tạm trú tại:</span> {personalHistory.currentResidence}
             </p>
           )}
+          {renderEmptyLines(20)}
         </div>
       </PageWrapper>
 
-      {/* Page 10: Những công việc, chức vụ đã qua */}
-      <PageWrapper pageNum={10} actualPageNum={3}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(15) NHỮNG CÔNG VIỆC, CHỨC VỤ ĐÃ QUA</h2>
-        <table className="w-full border-collapse border border-black text-[13pt]">
+      {/* Page 10: Lịch sử bản thân 2 */}
+      <PageWrapper pageNum={10}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">LỊCH SỬ BẢN THÂN</h2>
+        <div className="whitespace-pre-wrap text-justify leading-loose">
+          {renderEmptyLines(25)}
+        </div>
+      </PageWrapper>
+
+      {/* Page 11: Những công việc, chức vụ đã qua 1 */}
+      <PageWrapper pageNum={11}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(15) NHỮNG CÔNG VIỆC, CHỨC VỤ ĐÃ QUA</h2>
+        <table className="w-full border-collapse border border-black text-sm">
           <thead>
             <tr>
-              <th className="border border-black p-2 w-1/4 font-normal">Từ tháng, năm<br/>đến tháng, năm</th>
-              <th className="border border-black p-2 font-normal">Làm việc gì, ở đâu</th>
-              <th className="border border-black p-2 w-1/4 font-normal">Chức vụ</th>
+              <th className="border border-black p-2 w-1/4">Từ tháng, năm<br/>đến tháng, năm</th>
+              <th className="border border-black p-2">Làm việc gì, ở đâu</th>
+              <th className="border border-black p-2 w-1/4">Chức vụ</th>
             </tr>
           </thead>
           <tbody>
             {jobHistory?.slice(0, 15).map((j: any, i: number) => (
               <tr key={i}>
-                <td className="border border-black p-2 text-center text-red-600">{j.startDate} - {j.endDate}</td>
-                <td className="border border-black p-2 text-red-600">{j.description}</td>
-                <td className="border border-black p-2 text-center text-red-600">{j.position}</td>
+                <td className="border border-black p-2 text-center">{j.startDate} - {j.endDate}</td>
+                <td className="border border-black p-2">{j.description}</td>
+                <td className="border border-black p-2 text-center">{j.position}</td>
               </tr>
             ))}
             {Array.from({ length: Math.max(0, 15 - (jobHistory?.slice(0, 15).length || 0)) }).map((_, i) => (
@@ -308,41 +340,99 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         </table>
       </PageWrapper>
 
-      {/* Page 11: Đặc điểm lịch sử */}
-      <PageWrapper pageNum={11} actualPageNum={4}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(16) ĐẶC ĐIỂM LỊCH SỬ</h2>
-        <div className="whitespace-pre-wrap text-justify leading-loose text-red-600">
+      {/* Page 12: Những công việc, chức vụ đã qua 2 */}
+      <PageWrapper pageNum={12}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">NHỮNG CÔNG VIỆC, CHỨC VỤ ĐÃ QUA</h2>
+        <table className="w-full border-collapse border border-black text-sm">
+          <thead>
+            <tr>
+              <th className="border border-black p-2 w-1/4">Từ tháng, năm<br/>đến tháng, năm</th>
+              <th className="border border-black p-2">Làm việc gì, ở đâu</th>
+              <th className="border border-black p-2 w-1/4">Chức vụ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobHistory?.slice(15, 30).map((j: any, i: number) => (
+              <tr key={i}>
+                <td className="border border-black p-2 text-center">{j.startDate} - {j.endDate}</td>
+                <td className="border border-black p-2">{j.description}</td>
+                <td className="border border-black p-2 text-center">{j.position}</td>
+              </tr>
+            ))}
+            {Array.from({ length: Math.max(0, 15 - (jobHistory?.slice(15, 30).length || 0)) }).map((_, i) => (
+              <tr key={`empty-${i}`}>
+                <td className="border border-black p-4"></td>
+                <td className="border border-black p-4"></td>
+                <td className="border border-black p-4"></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </PageWrapper>
+
+      {/* Page 13: Những công việc, chức vụ đã qua 3 */}
+      <PageWrapper pageNum={13}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">NHỮNG CÔNG VIỆC, CHỨC VỤ ĐÃ QUA</h2>
+        <table className="w-full border-collapse border border-black text-sm">
+          <thead>
+            <tr>
+              <th className="border border-black p-2 w-1/4">Từ tháng, năm<br/>đến tháng, năm</th>
+              <th className="border border-black p-2">Làm việc gì, ở đâu</th>
+              <th className="border border-black p-2 w-1/4">Chức vụ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobHistory?.slice(30, 45).map((j: any, i: number) => (
+              <tr key={i}>
+                <td className="border border-black p-2 text-center">{j.startDate} - {j.endDate}</td>
+                <td className="border border-black p-2">{j.description}</td>
+                <td className="border border-black p-2 text-center">{j.position}</td>
+              </tr>
+            ))}
+            {Array.from({ length: Math.max(0, 15 - (jobHistory?.slice(30, 45).length || 0)) }).map((_, i) => (
+              <tr key={`empty-${i}`}>
+                <td className="border border-black p-4"></td>
+                <td className="border border-black p-4"></td>
+                <td className="border border-black p-4"></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </PageWrapper>
+
+      {/* Page 14: Đặc điểm lịch sử */}
+      <PageWrapper pageNum={14}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(16) ĐẶC ĐIỂM LỊCH SỬ</h2>
+        <div className="whitespace-pre-wrap text-justify leading-loose">
           {otherInfo.historicalCharacteristics || ""}
-        </div>
-        <div className="mt-4">
-          {renderEmptyLines(20)}
+          {renderEmptyLines(25)}
         </div>
       </PageWrapper>
 
-      {/* Page 12: Đào tạo & Đi nước ngoài */}
-      <PageWrapper pageNum={12} actualPageNum={5}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(17) NHỮNG LỚP ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA</h2>
-        <table className="w-full border-collapse border border-black text-[13pt] mb-10">
+      {/* Page 15: Đào tạo & Đi nước ngoài */}
+      <PageWrapper pageNum={15}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(17) NHỮNG LỚP ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA</h2>
+        <table className="w-full border-collapse border border-black text-xs mb-10">
           <thead>
             <tr>
-              <th className="border border-black p-1 font-normal">Từ tháng,<br/>năm đến<br/>tháng,<br/>năm</th>
-              <th className="border border-black p-1 font-normal">Ngành học hoặc<br/>tên lớp học</th>
-              <th className="border border-black p-1 font-normal">Tên trường,<br/>cấp phụ trách</th>
-              <th className="border border-black p-1 font-normal">Hình thức<br/>học</th>
-              <th className="border border-black p-1 font-normal">Văn bằng,<br/>chứng chi,<br/>trình độ gì</th>
+              <th className="border border-black p-1">Từ tháng,<br/>năm đến<br/>tháng,<br/>năm</th>
+              <th className="border border-black p-1">Ngành học hoặc<br/>tên lớp học</th>
+              <th className="border border-black p-1">Tên trường,<br/>cấp phụ trách</th>
+              <th className="border border-black p-1">Hình thức<br/>học</th>
+              <th className="border border-black p-1">Văn bằng,<br/>chứng chỉ,<br/>trình độ gì</th>
             </tr>
           </thead>
           <tbody>
             {conditions.trainingClasses?.map((t: any, i: number) => (
               <tr key={i}>
-                <td className="border border-black p-1 text-center text-red-600">{t.startDate} - {t.endDate}</td>
-                <td className="border border-black p-1 text-red-600">{t.name}</td>
-                <td className="border border-black p-1 text-red-600">{t.schoolName}</td>
-                <td className="border border-black p-1 text-center text-red-600">{t.type}</td>
-                <td className="border border-black p-1 text-center text-red-600">{t.certificate}</td>
+                <td className="border border-black p-1 text-center">{t.startDate} - {t.endDate}</td>
+                <td className="border border-black p-1">{t.name}</td>
+                <td className="border border-black p-1">{t.schoolName}</td>
+                <td className="border border-black p-1 text-center">{t.type}</td>
+                <td className="border border-black p-1 text-center">{t.certificate}</td>
               </tr>
             ))}
-            {Array.from({ length: Math.max(0, 3 - (conditions.trainingClasses?.length || 0)) }).map((_, i) => (
+            {Array.from({ length: Math.max(0, 6 - (conditions.trainingClasses?.length || 0)) }).map((_, i) => (
               <tr key={`empty-t-${i}`}>
                 <td className="border border-black p-4"></td>
                 <td className="border border-black p-4"></td>
@@ -354,26 +444,26 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
           </tbody>
         </table>
 
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(18) ĐI NƯỚC NGOÀI</h2>
-        <table className="w-full border-collapse border border-black text-[13pt]">
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(18) ĐI NƯỚC NGOÀI</h2>
+        <table className="w-full border-collapse border border-black text-xs">
           <thead>
             <tr>
-              <th className="border border-black p-1 font-normal">Từ tháng,<br/>năm đến<br/>tháng năm</th>
-              <th className="border border-black p-1 font-normal">Nội dung đi</th>
-              <th className="border border-black p-1 font-normal">Nước nào</th>
-              <th className="border border-black p-1 font-normal">Cơ quan, đơn vị, tổ<br/>chức quyết định</th>
+              <th className="border border-black p-1">Từ tháng,<br/>năm đến<br/>tháng năm</th>
+              <th className="border border-black p-1">Nội dung đi</th>
+              <th className="border border-black p-1">Nước nào</th>
+              <th className="border border-black p-1">Cơ quan, đơn vị, tổ<br/>chức quyết định</th>
             </tr>
           </thead>
           <tbody>
             {otherInfo.abroadTrips?.map((a: any, i: number) => (
               <tr key={i}>
-                <td className="border border-black p-1 text-center text-red-600">{a.timeRange}</td>
-                <td className="border border-black p-1 text-red-600">{a.content}</td>
-                <td className="border border-black p-1 text-center text-red-600">{a.country}</td>
-                <td className="border border-black p-1 text-center text-red-600">{a.decisionMaker}</td>
+                <td className="border border-black p-1 text-center">{a.timeRange}</td>
+                <td className="border border-black p-1">{a.content}</td>
+                <td className="border border-black p-1 text-center">{a.country}</td>
+                <td className="border border-black p-1 text-center">{a.decisionMaker}</td>
               </tr>
             ))}
-            {Array.from({ length: Math.max(0, 3 - (otherInfo.abroadTrips?.length || 0)) }).map((_, i) => (
+            {Array.from({ length: Math.max(0, 6 - (otherInfo.abroadTrips?.length || 0)) }).map((_, i) => (
               <tr key={`empty-a-${i}`}>
                 <td className="border border-black p-4"></td>
                 <td className="border border-black p-4"></td>
@@ -385,23 +475,23 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         </table>
       </PageWrapper>
 
-      {/* Page 13: Khen thưởng & Kỷ luật */}
-      <PageWrapper pageNum={13} actualPageNum={6}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(19) KHEN THƯỞNG</h2>
-        <table className="w-full border-collapse border border-black text-[13pt] mb-10">
+      {/* Page 16: Khen thưởng & Kỷ luật */}
+      <PageWrapper pageNum={16}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(19) KHEN THƯỞNG</h2>
+        <table className="w-full border-collapse border border-black text-sm mb-10">
           <thead>
             <tr>
-              <th className="border border-black p-2 w-1/4 font-normal">Tháng,<br/>năm</th>
-              <th className="border border-black p-2 font-normal">Lý do, hình thức</th>
-              <th className="border border-black p-2 w-1/4 font-normal">Cấp quyết định</th>
+              <th className="border border-black p-2 w-1/4">Tháng,<br/>năm</th>
+              <th className="border border-black p-2">Lý do, hình thức</th>
+              <th className="border border-black p-2 w-1/4">Cấp quyết định</th>
             </tr>
           </thead>
           <tbody>
             {otherInfo.rewards?.map((r: any, i: number) => (
               <tr key={i}>
-                <td className="border border-black p-2 text-center text-red-600">{r.date}</td>
-                <td className="border border-black p-2 text-red-600">{r.content}</td>
-                <td className="border border-black p-2 text-center text-red-600">{r.level}</td>
+                <td className="border border-black p-2 text-center">{r.date}</td>
+                <td className="border border-black p-2">{r.content}</td>
+                <td className="border border-black p-2 text-center">{r.level}</td>
               </tr>
             ))}
             {Array.from({ length: Math.max(0, 8 - (otherInfo.rewards?.length || 0)) }).map((_, i) => (
@@ -414,21 +504,21 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
           </tbody>
         </table>
 
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(20) KỶ LUẬT</h2>
-        <table className="w-full border-collapse border border-black text-[13pt]">
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(20) KỶ LUẬT</h2>
+        <table className="w-full border-collapse border border-black text-sm">
           <thead>
             <tr>
-              <th className="border border-black p-2 w-1/4 font-normal">Tháng,<br/>năm</th>
-              <th className="border border-black p-2 font-normal">Lý do, hình thức</th>
-              <th className="border border-black p-2 w-1/4 font-normal">Cấp quyết định</th>
+              <th className="border border-black p-2 w-1/4">Tháng,<br/>năm</th>
+              <th className="border border-black p-2">Lý do, hình thức</th>
+              <th className="border border-black p-2 w-1/4">Cấp quyết định</th>
             </tr>
           </thead>
           <tbody>
             {otherInfo.disciplines?.map((d: any, i: number) => (
               <tr key={i}>
-                <td className="border border-black p-2 text-center text-red-600">{d.date}</td>
-                <td className="border border-black p-2 text-red-600">{d.content}</td>
-                <td className="border border-black p-2 text-center text-red-600">{d.level}</td>
+                <td className="border border-black p-2 text-center">{d.date}</td>
+                <td className="border border-black p-2">{d.content}</td>
+                <td className="border border-black p-2 text-center">{d.level}</td>
               </tr>
             ))}
             {Array.from({ length: Math.max(0, 6 - (otherInfo.disciplines?.length || 0)) }).map((_, i) => (
@@ -442,77 +532,77 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         </table>
       </PageWrapper>
 
-      {/* Page 14-31: Hoàn cảnh gia đình */}
-      {Array.from({ length: 18 }).map((_, pageIndex) => {
-        const pageNum = 14 + pageIndex;
-        const actualPageNum = 7 + pageIndex;
+      {/* Page 17-40: Hoàn cảnh gia đình */}
+      {Array.from({ length: 24 }).map((_, pageIndex) => {
+        const pageNum = 17 + pageIndex;
         return (
-          <PageWrapper key={`family-page-${pageNum}`} pageNum={pageNum} actualPageNum={actualPageNum}>
-            {pageIndex === 0 && (
-              <>
-                <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(21) HOÀN CẢNH GIA ĐÌNH</h2>
-                <h3 className="text-[13pt] font-bold uppercase mb-2">I. GIA ĐÌNH BẢN THÂN</h3>
-              </>
-            )}
-            <div className="space-y-4 text-[13pt]">
+          <PageWrapper key={`family-page-${pageNum}`} pageNum={pageNum}>
+            <h2 className="text-lg font-bold uppercase text-center mb-6">
+              {pageIndex === 0 ? "(21) HOÀN CẢNH GIA ĐÌNH" : "HOÀN CẢNH GIA ĐÌNH"}
+            </h2>
+            <div className="space-y-6 text-sm">
               {pageIndex === 0 ? (
                 <>
                   {familyHistory.map((member: any, index: number) => (
-                    <div key={index} className="pb-4">
-                      <p className="mb-1">{index + 1}. {member.relation}</p>
-                      <div className="space-y-1">
-                        <p>- Họ và tên: <span className="uppercase text-red-600">{member.fullName}</span> <span className="ml-10">Năm sinh: <span className="text-red-600">{member.birthYear}</span></span></p>
-                        <p>- Tôn giáo: <span className="text-red-600">{member.religion}</span></p>
-                        <p>- Dân tộc: <span className="text-red-600">{member.ethnicity}</span></p>
-                        <p>- Quốc tịch: <span className="text-red-600">{member.nationality || 'Việt Nam'}</span></p>
-                        <p>- Quê quán: <span className="text-red-600">{member.hometown}</span></p>
-                        <p>- Nơi sinh: <span className="text-red-600">{member.birthplace}</span></p>
-                        <p>- Chỗ ở hiện nay: <span className="text-red-600">{member.permanentAddress}</span></p>
-                        <p>- Nghề nghiệp: <span className="text-red-600">{member.job}</span></p>
-                        <p>- Quá trình công tác, sinh sống của bản thân (lịch sử bản thân):</p>
-                        {member.history && member.history.length > 0 && (
-                          <ul className="list-disc pl-8 text-red-600">
+                    <div key={index} className="pb-4 border-b border-gray-300">
+                      <p className="font-bold mb-2 uppercase">{member.relation}: {member.fullName}</p>
+                      <table className="w-full mb-2" style={{ borderCollapse: 'collapse', border: 'none' }}>
+                        <tbody>
+                          <tr>
+                            <td style={{ width: '50%', border: 'none', padding: '2px 8px 2px 0', verticalAlign: 'top' }}>
+                              <p><span>Năm sinh:</span> {member.birthYear}</p>
+                              <p><span>Nơi cư trú:</span> {member.permanentAddress}</p>
+                              <p><span>Dân tộc:</span> {member.ethnicity}</p>
+                            </td>
+                            <td style={{ width: '50%', border: 'none', padding: '2px 0 2px 8px', verticalAlign: 'top' }}>
+                              <p><span>Quê quán:</span> {member.hometown}</p>
+                              <p><span>Nghề nghiệp:</span> {member.job}</p>
+                              <p><span>Tôn giáo:</span> {member.religion}</p>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan={2} style={{ border: 'none', padding: '2px 0', verticalAlign: 'top' }}>
+                              <p><span>Thái độ chính trị:</span> {member.politicalAttitude}</p>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      {member.history && member.history.length > 0 && (
+                        <div className="mt-2">
+                          <p className="font-semibold text-xs">Quá trình công tác:</p>
+                          <ul className="list-disc pl-5 text-xs">
                             {member.history.map((h: any, hi: number) => (
                               <li key={hi}>{h.timeRange}: {h.description}</li>
                             ))}
                           </ul>
-                        )}
-                        <p>- Thái độ chính trị hiện nay: <span className="text-red-600">{member.politicalAttitude}</span></p>
-                      </div>
+                        </div>
+                      )}
                     </div>
                   ))}
-                  {pageIndex === 17 && (
-                    <div className="mt-10">
-                      <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(22) TỰ NHẬN XÉT</h2>
-                    </div>
-                  )}
+                  {renderEmptyLines(Math.max(0, 25 - familyHistory.length * 5))}
                 </>
               ) : (
-                <>
-                  {pageIndex === 17 ? (
-                    <div className="mt-10">
-                      <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(22) TỰ NHẬN XÉT</h2>
-                    </div>
-                  ) : null}
-                </>
+                renderEmptyLines(25)
               )}
             </div>
           </PageWrapper>
         );
       })}
 
-      {/* Page 32: Tự nhận xét & Cam đoan */}
-      <PageWrapper pageNum={32} actualPageNum={25}>
+      {/* Page 41: Tự nhận xét & Cam đoan */}
+      <PageWrapper pageNum={41}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(22) TỰ NHẬN XÉT</h2>
         <p className="text-center italic mb-4">(Ghi theo hướng dẫn ở mục 22)</p>
-        <div className="whitespace-pre-wrap text-justify leading-loose mb-10 text-red-600">
+        <div className="whitespace-pre-wrap text-justify leading-loose mb-10">
           {selfAssessment.selfAssessment || ""}
+          {renderEmptyLines(8)}
         </div>
-        {renderEmptyLines(10)}
 
-        <h2 className="text-[13pt] font-bold uppercase text-center mt-10 mb-6">(23) CAM ĐOAN VÀ KÝ TÊN</h2>
-        <p className="text-center italic mb-4">( Ghi theo hướng dẫn tại mục 23)</p>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(23) CAM ĐOAN VÀ KÝ TÊN</h2>
+        <p className="text-center italic mb-4">(Ghi theo hướng dẫn tại mục 23)</p>
         <div className="text-justify leading-loose mb-10">
-          {renderEmptyLines(5)}
+          Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng về những nội dung đã khai trong lý lịch.
+          {renderEmptyLines(4)}
         </div>
 
         <div className="mt-10 text-right pr-10">
@@ -524,13 +614,12 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         </div>
       </PageWrapper>
 
-      {/* Page 33-41: Nhận xét của cấp ủy... */}
+      {/* Page 42-50: Nhận xét của cấp ủy... */}
       {Array.from({ length: 9 }).map((_, pageIndex) => {
-        const pageNum = 33 + pageIndex;
-        const actualPageNum = 26 + pageIndex;
+        const pageNum = 42 + pageIndex;
         return (
-          <PageWrapper key={`nhan-xet-cap-uy-${pageNum}`} pageNum={pageNum} actualPageNum={actualPageNum}>
-            <h2 className="text-[13pt] font-bold uppercase text-center mb-6">
+          <PageWrapper key={`nhan-xet-cap-uy-${pageNum}`} pageNum={pageNum}>
+            <h2 className="text-lg font-bold uppercase text-center mb-6">
               {pageIndex === 0 ? "(24) NHẬN XÉT CỦA CẤP ỦY, TỔ CHỨC ĐẢNG NƠI ĐẾN\nTHẨM TRA LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG" : "NHẬN XÉT CỦA CẤP ỦY, TỔ CHỨC ĐẢNG NƠI ĐẾN THẨM TRA\nLÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG"}
             </h2>
             <div className="space-y-6 text-sm">
@@ -540,9 +629,9 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         );
       })}
 
-      {/* Page 42: Nhận xét của chi ủy hoặc của chi bộ */}
-      <PageWrapper pageNum={42} actualPageNum={35}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(25) NHẬN XÉT CỦA CHI ỦY HOẶC CỦA CHI BỘ</h2>
+      {/* Page 51: Nhận xét của chi ủy hoặc của chi bộ */}
+      <PageWrapper pageNum={51}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(25) NHẬN XÉT CỦA CHI ỦY HOẶC CỦA CHI BỘ</h2>
         <p className="text-center italic mb-4">(Ghi theo hướng dẫn tại mục 25)</p>
         <div className="space-y-6 text-sm">
           {renderEmptyLines(13)}
@@ -553,9 +642,9 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         </div>
       </PageWrapper>
 
-      {/* Page 43: Chứng nhận của cấp ủy cơ sở... */}
-      <PageWrapper pageNum={43} actualPageNum={36}>
-        <h2 className="text-[13pt] font-bold uppercase text-center mb-6">(26) CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ HOẶC CẤP ỦY CẤP<br/>TRÊN TRỰC TIẾP CỦA TỔ CHỨC CƠ SỞ ĐẢNG</h2>
+      {/* Page 52: Chứng nhận của cấp ủy cơ sở... */}
+      <PageWrapper pageNum={52}>
+        <h2 className="text-lg font-bold uppercase text-center mb-6">(26) CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ HOẶC CẤP ỦY CẤP<br/>TRÊN TRỰC TIẾP CỦA TỔ CHỨC CƠ SỞ ĐẢNG</h2>
         <p className="text-center italic mb-4">(Ghi theo hướng dẫn tại mục 26)</p>
         <div className="space-y-6 text-sm">
           {renderEmptyLines(13)}
