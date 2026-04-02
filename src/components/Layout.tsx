@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, User as UserIcon, Menu, X, Home, FileText, Shield, ChevronRight } from 'lucide-react';
+import { LogOut, User as UserIcon, Menu, X, Home, FileText, Shield, ChevronRight, BookOpen, UserPlus, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Layout() {
@@ -18,14 +18,33 @@ export default function Layout() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const navLinks = [
-    { id: 'home', name: 'Trang chủ', path: '/', icon: <Home size={20} /> },
+    ...(profile?.role !== 'admin' ? [
+      { id: 'home', name: 'Trang chủ', path: '/', icon: <Home size={20} /> }
+    ] : []),
     ...(profile?.role === 'student' ? [
       { id: 'application', name: 'Hồ sơ kết nạp', path: '/application', icon: <FileText size={20} /> }
     ] : []),
     ...(profile?.role === 'admin' ? [
-      { id: 'admin', name: 'Quản trị hệ thống', path: '/', icon: <Shield size={20} /> }
+      { id: 'dashboard', name: 'Tổng quan', path: '/?tab=dashboard', icon: <Home size={20} /> },
+      { id: 'applications', name: 'Hồ sơ', path: '/?tab=applications', icon: <FileText size={20} /> },
+      { id: 'training', name: 'Chưa học cảm tình', path: '/?tab=training', icon: <BookOpen size={20} /> },
+      { id: 'users', name: 'Đảng viên', path: '/?tab=users', icon: <UserPlus size={20} /> },
+      { id: 'permissions', name: 'Phân công', path: '/?tab=permissions', icon: <Shield size={20} /> },
+      { id: 'settings', name: 'Cấu hình', path: '/?tab=settings', icon: <Settings size={20} /> },
     ] : []),
   ];
+
+  const isLinkActive = (linkPath: string) => {
+    if (linkPath === '/') {
+      return location.pathname === '/' && !location.search;
+    }
+    if (linkPath.startsWith('/?tab=')) {
+      const currentTab = new URLSearchParams(location.search).get('tab') || 'dashboard';
+      const linkTab = new URLSearchParams(linkPath.split('?')[1]).get('tab');
+      return location.pathname === '/' && currentTab === linkTab;
+    }
+    return location.pathname === linkPath;
+  };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-brand-red text-white overflow-y-auto sidebar-scroll">
@@ -51,22 +70,25 @@ export default function Layout() {
       </div>
 
       <nav className="flex-grow py-4 px-3 space-y-1">
-        {navLinks.map((link) => (
-          <Link
-            key={link.id}
-            to={link.path}
-            onClick={() => setIsSidebarOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${
-              location.pathname === link.path 
-                ? 'bg-white/20 text-brand-yellow font-medium' 
-                : 'hover:bg-white/10'
-            }`}
-          >
-            {link.icon}
-            <span>{link.name}</span>
-            {location.pathname === link.path && <ChevronRight size={16} className="ml-auto" />}
-          </Link>
-        ))}
+        {navLinks.map((link) => {
+          const active = isLinkActive(link.path);
+          return (
+            <Link
+              key={link.id}
+              to={link.path}
+              onClick={() => setIsSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${
+                active 
+                  ? 'bg-white/20 text-brand-yellow font-medium' 
+                  : 'hover:bg-white/10'
+              }`}
+            >
+              {link.icon}
+              <span>{link.name}</span>
+              {active && <ChevronRight size={16} className="ml-auto" />}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="p-3 border-t border-brand-red-dark space-y-3">

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { FormConfigProvider } from './contexts/FormConfigContext';
 import Layout from './components/Layout';
@@ -28,7 +28,7 @@ export default function App() {
   return (
     <AuthProvider>
       <FormConfigProvider>
-        <HashRouter>
+        <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -36,9 +36,11 @@ export default function App() {
               <Route index element={<Dashboard />} />
               <Route path="application" element={<ApplicationForm />} />
               <Route path="application/:id" element={<ApplicationForm />} />
+              <Route path="admin" element={<Navigate to="/?tab=dashboard" replace />} />
             </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </HashRouter>
+        </BrowserRouter>
       </FormConfigProvider>
     </AuthProvider>
   );
