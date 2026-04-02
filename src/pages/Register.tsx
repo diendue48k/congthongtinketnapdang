@@ -221,7 +221,7 @@ export default function Register() {
 
       {/* Footer */}
       <footer className="bg-[#c62828] text-white/90 py-5 text-center text-sm font-medium tracking-wide">
-        © 2026 Bản quyền thuộc về Chi bộ Sinh viên
+        © 2026 Bản quyền thuộc về Chi bộ Sinh viên - Thiết kế và phát triển bởi Lê Vĩnh Diện
       </footer>
     </div>
   );
