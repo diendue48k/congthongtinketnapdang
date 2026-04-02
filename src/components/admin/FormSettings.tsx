@@ -131,9 +131,9 @@ export default function FormSettings() {
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình (Family History)</label>
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Ông nội</label>
               <button 
-                onClick={() => loadDefaultTemplate('familyHistory')}
+                onClick={() => loadDefaultTemplate('familyHistory_ongNoi')}
                 className="text-[8px] font-bold text-blue-600 hover:underline"
               >
                 Sử dụng mẫu mặc định
@@ -142,9 +142,123 @@ export default function FormSettings() {
             <textarea
               className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
               rows={2}
-              value={templates.familyHistory || ''}
-              onChange={(e) => handleTemplateChange('familyHistory', e.target.value)}
-              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình..."
+              value={templates.familyHistory_ongNoi || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_ongNoi', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Ông nội)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Bà nội</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_baNoi')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_baNoi || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_baNoi', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Bà nội)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Ông ngoại</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_ongNgoai')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_ongNgoai || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_ongNgoai', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Ông ngoại)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Bà ngoại</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_baNgoai')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_baNgoai || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_baNgoai', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Bà ngoại)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Cha ruột</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_chaRuot')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_chaRuot || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_chaRuot', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Cha ruột)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Mẹ ruột</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_meRuot')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_meRuot || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_meRuot', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Mẹ ruột)..."
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider">Mẫu Lịch sử gia đình - Anh/Chị/Em ruột</label>
+              <button 
+                onClick={() => loadDefaultTemplate('familyHistory_emRuot')}
+                className="text-[8px] font-bold text-blue-600 hover:underline"
+              >
+                Sử dụng mẫu mặc định
+              </button>
+            </div>
+            <textarea
+              className="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-[10px] focus:ring-brand-red focus:border-brand-red transition-all"
+              rows={2}
+              value={templates.familyHistory_emRuot || ''}
+              onChange={(e) => handleTemplateChange('familyHistory_emRuot', e.target.value)}
+              placeholder="Nhập nội dung mẫu cho phần lịch sử gia đình (Anh/Chị/Em ruột)..."
             />
           </div>
 
@@ -226,8 +340,23 @@ export default function FormSettings() {
             { id: 'personalHistory.history', defaultLabel: 'Lịch sử bản thân', section: 'Lịch sử bản thân' },
             
             // Lịch sử gia đình
-            { id: 'familyHistory.parents', defaultLabel: 'Hoàn cảnh gia đình (Cha mẹ)', section: 'Lịch sử gia đình' },
-            { id: 'familyHistory.siblings', defaultLabel: 'Anh chị em ruột', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.relation', defaultLabel: 'Quan hệ', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.fullName', defaultLabel: 'Họ và tên', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.birthYear', defaultLabel: 'Năm sinh', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.deathYear', defaultLabel: 'Năm mất (nếu có)', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.hometown', defaultLabel: 'Quê quán', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.birthplace', defaultLabel: 'Nơi sinh', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.permanentAddress', defaultLabel: 'Chỗ ở hiện nay', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.religion', defaultLabel: 'Tôn giáo', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.ethnicity', defaultLabel: 'Dân tộc', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.nationality', defaultLabel: 'Quốc tịch', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.job', defaultLabel: 'Nghề nghiệp', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.cccd', defaultLabel: 'Số CCCD', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.isPartyMember', defaultLabel: 'Là Đảng viên ĐCSVN', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.partyDetails', defaultLabel: 'Thông tin Đảng viên', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.history', defaultLabel: 'Quá trình công tác, sinh sống', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.rewards', defaultLabel: 'Khen thưởng', section: 'Lịch sử gia đình' },
+            { id: 'familyHistory.politicalAttitude', defaultLabel: 'Thái độ chính trị', section: 'Lịch sử gia đình' },
             
             // Thông tin khác
             { id: 'otherInfo.historicalCharacteristics', defaultLabel: 'Đặc điểm lịch sử', section: 'Thông tin khác' },

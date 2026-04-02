@@ -191,6 +191,35 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
   const { config } = useFormConfig();
   const ethnicities = config.lists?.ethnicities || [];
   const religions = config.lists?.religions || [];
+
+  const getFieldConfig = (id: string, defaultLabel: string, defaultRequired = true) => {
+    const field = config.fields?.[id];
+    return {
+      label: field?.label || defaultLabel,
+      required: field?.required !== undefined ? field.required : defaultRequired,
+      placeholder: field?.placeholder || '',
+      hidden: field?.hidden || false
+    };
+  };
+
+  const relationConfig = getFieldConfig('familyHistory.relation', 'Quan hệ');
+  const fullNameConfig = getFieldConfig('familyHistory.fullName', 'Họ và tên');
+  const birthYearConfig = getFieldConfig('familyHistory.birthYear', 'Năm sinh');
+  const deathYearConfig = getFieldConfig('familyHistory.deathYear', 'Năm mất (nếu có)', false);
+  const hometownConfig = getFieldConfig('familyHistory.hometown', 'Quê quán');
+  const birthplaceConfig = getFieldConfig('familyHistory.birthplace', 'Nơi sinh');
+  const permanentAddressConfig = getFieldConfig('familyHistory.permanentAddress', 'Chỗ ở hiện nay');
+  const religionConfig = getFieldConfig('familyHistory.religion', 'Tôn giáo');
+  const ethnicityConfig = getFieldConfig('familyHistory.ethnicity', 'Dân tộc');
+  const nationalityConfig = getFieldConfig('familyHistory.nationality', 'Quốc tịch');
+  const jobConfig = getFieldConfig('familyHistory.job', 'Nghề nghiệp', false);
+  const cccdConfig = getFieldConfig('familyHistory.cccd', 'Số CCCD', false);
+  const isPartyMemberConfig = getFieldConfig('familyHistory.isPartyMember', 'Là Đảng viên ĐCSVN', false);
+  const partyDetailsConfig = getFieldConfig('familyHistory.partyDetails', 'Thông tin Đảng viên', false);
+  const historyConfig = getFieldConfig('familyHistory.history', 'Quá trình công tác, sinh sống');
+  const rewardsConfig = getFieldConfig('familyHistory.rewards', 'Khen thưởng', false);
+  const politicalAttitudeConfig = getFieldConfig('familyHistory.politicalAttitude', 'Thái độ chính trị');
+
   const { register, control, trigger, watch, formState: { errors } } = useForm<any>({
     mode: 'onChange',
     defaultValues: {
@@ -245,8 +274,22 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
     return 'Cha ruột';
   };
 
+  const getTemplateKey = (relation: string) => {
+    if (!relation) return 'familyHistory_chaRuot';
+    if (relation.includes('Ông nội')) return 'familyHistory_ongNoi';
+    if (relation.includes('Bà nội')) return 'familyHistory_baNoi';
+    if (relation.includes('Ông ngoại')) return 'familyHistory_ongNgoai';
+    if (relation.includes('Bà ngoại')) return 'familyHistory_baNgoai';
+    if (relation.includes('Cha') || relation.includes('Bố')) return 'familyHistory_chaRuot';
+    if (relation.includes('Mẹ') || relation.includes('Má')) return 'familyHistory_meRuot';
+    if (relation.includes('Anh') || relation.includes('Chị') || relation.includes('Em')) return 'familyHistory_emRuot';
+    return 'familyHistory_chaRuot';
+  };
+
   const sampleKey = getSampleKey(currentRelation);
   const sampleData = SAMPLES[sampleKey];
+  const templateKey = getTemplateKey(currentRelation);
+  const templateData = config.templates?.[templateKey];
 
   const validateAddress = (value: string) => {
     if (!value) return true; // Optional if dead
@@ -327,8 +370,8 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
 
       {showSample && (
         <div className="bg-gray-50 p-4 rounded-md mb-6 text-sm text-gray-800 border border-gray-200">
-          {config.templates?.familyHistory ? (
-            <div className="whitespace-pre-wrap text-gray-700">{config.templates.familyHistory}</div>
+          {templateData ? (
+            <div className="whitespace-pre-wrap text-gray-700">{templateData}</div>
           ) : sampleData ? (
             <>
               <p className="font-semibold mb-3 text-gray-900">Mẫu kê khai Lịch sử chính trị người thân (Ví dụ: {sampleData.title}):</p>
@@ -404,9 +447,9 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                 <div className="p-4 space-y-6 border-t border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Quan hệ *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{relationConfig.label} {relationConfig.required && '*'}</label>
                       <select
-                        {...register(`familyMembers.${index}.relation` as const, { required: 'Bắt buộc' })}
+                        {...register(`familyMembers.${index}.relation` as const, { required: relationConfig.required ? 'Bắt buộc' : false })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
                       >
                         <option value="">-- Chọn --</option>
@@ -415,27 +458,30 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                       <FieldFeedback fieldPath={`familyHistory.${index}.relation`} feedback={fieldFeedback[`familyHistory.${index}.relation`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Họ và tên *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{fullNameConfig.label} {fullNameConfig.required && '*'}</label>
                       <input
-                        {...register(`familyMembers.${index}.fullName` as const, { required: 'Bắt buộc' })}
+                        {...register(`familyMembers.${index}.fullName` as const, { required: fullNameConfig.required ? 'Bắt buộc' : false })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red uppercase"
+                        placeholder={fullNameConfig.placeholder}
                       />
                       <FieldFeedback fieldPath={`familyHistory.${index}.fullName`} feedback={fieldFeedback[`familyHistory.${index}.fullName`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Năm sinh *</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{birthYearConfig.label} {birthYearConfig.required && '*'}</label>
                         <input
-                          {...register(`familyMembers.${index}.birthYear` as const, { required: 'Bắt buộc' })}
+                          {...register(`familyMembers.${index}.birthYear` as const, { required: birthYearConfig.required ? 'Bắt buộc' : false })}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                          placeholder={birthYearConfig.placeholder}
                         />
                         <FieldFeedback fieldPath={`familyHistory.${index}.birthYear`} feedback={fieldFeedback[`familyHistory.${index}.birthYear`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Năm mất (nếu có)</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{deathYearConfig.label} {deathYearConfig.required && '*'}</label>
                         <input
-                          {...register(`familyMembers.${index}.deathYear` as const)}
+                          {...register(`familyMembers.${index}.deathYear` as const, { required: deathYearConfig.required ? 'Bắt buộc' : false })}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                          placeholder={deathYearConfig.placeholder}
                         />
                         <FieldFeedback fieldPath={`familyHistory.${index}.deathYear`} feedback={fieldFeedback[`familyHistory.${index}.deathYear`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                       </div>
@@ -444,13 +490,13 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Quê quán *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{hometownConfig.label} {hometownConfig.required && '*'}</label>
                       <input
                         {...register(`familyMembers.${index}.hometown` as const, { 
-                          required: 'Bắt buộc', validate: validateHometown 
+                          required: hometownConfig.required ? 'Bắt buộc' : false, validate: validateHometown 
                         })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
-                        placeholder="Có địa chỉ cũ và mới"
+                        placeholder={hometownConfig.placeholder || "Có địa chỉ cũ và mới"}
                       />
                       {errors?.familyMembers?.[index]?.hometown && (
                         <p className="text-red-500 text-xs mt-1">{errors?.familyMembers?.[index]?.hometown?.message as string}</p>
@@ -458,13 +504,13 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                       <FieldFeedback fieldPath={`familyHistory.${index}.hometown`} feedback={fieldFeedback[`familyHistory.${index}.hometown`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Nơi sinh *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{birthplaceConfig.label} {birthplaceConfig.required && '*'}</label>
                       <input
                         {...register(`familyMembers.${index}.birthplace` as const, { 
-                          required: 'Bắt buộc', validate: validateHometown 
+                          required: birthplaceConfig.required ? 'Bắt buộc' : false, validate: validateHometown 
                         })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
-                        placeholder="Có địa chỉ cũ và mới"
+                        placeholder={birthplaceConfig.placeholder || "Có địa chỉ cũ và mới"}
                       />
                       {errors?.familyMembers?.[index]?.birthplace && (
                         <p className="text-red-500 text-xs mt-1">{errors?.familyMembers?.[index]?.birthplace?.message as string}</p>
@@ -475,12 +521,13 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
 
                   {!isDead && (
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Nơi thường trú hiện nay *</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{permanentAddressConfig.label} {permanentAddressConfig.required && '*'}</label>
                       <input
                         {...register(`familyMembers.${index}.permanentAddress` as const, { 
-                          required: !isDead ? 'Bắt buộc' : false, validate: isDead ? undefined : validateAddress 
+                          required: permanentAddressConfig.required ? 'Bắt buộc' : false, validate: isDead ? undefined : validateAddress 
                         })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                        placeholder={permanentAddressConfig.placeholder}
                       />
                       {errors?.familyMembers?.[index]?.permanentAddress && (
                         <p className="text-red-500 text-xs mt-1">{errors?.familyMembers?.[index]?.permanentAddress?.message as string}</p>
@@ -491,9 +538,9 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Tôn giáo *</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{religionConfig.label} {religionConfig.required && '*'}</label>
                         <select
-                          {...register(`familyMembers.${index}.religion` as const, { required: 'Bắt buộc' })}
+                          {...register(`familyMembers.${index}.religion` as const, { required: religionConfig.required ? 'Bắt buộc' : false })}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
                         >
                           <option value="">-- Chọn --</option>
@@ -502,9 +549,9 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                         <FieldFeedback fieldPath={`familyHistory.${index}.religion`} feedback={fieldFeedback[`familyHistory.${index}.religion`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Dân tộc *</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{ethnicityConfig.label} {ethnicityConfig.required && '*'}</label>
                         <select
-                          {...register(`familyMembers.${index}.ethnicity` as const, { required: 'Bắt buộc' })}
+                          {...register(`familyMembers.${index}.ethnicity` as const, { required: ethnicityConfig.required ? 'Bắt buộc' : false })}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
                         >
                           <option value="">-- Chọn --</option>
@@ -513,19 +560,21 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                         <FieldFeedback fieldPath={`familyHistory.${index}.ethnicity`} feedback={fieldFeedback[`familyHistory.${index}.ethnicity`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Quốc tịch *</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{nationalityConfig.label} {nationalityConfig.required && '*'}</label>
                       <input
-                        {...register(`familyMembers.${index}.nationality` as const, { required: 'Bắt buộc' })}
+                        {...register(`familyMembers.${index}.nationality` as const, { required: nationalityConfig.required ? 'Bắt buộc' : false })}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                        placeholder={nationalityConfig.placeholder}
                       />
                       <FieldFeedback fieldPath={`familyHistory.${index}.nationality`} feedback={fieldFeedback[`familyHistory.${index}.nationality`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                     </div>
                     {!isDead && (
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Nghề nghiệp *</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">{jobConfig.label} {jobConfig.required && '*'}</label>
                         <input
-                          {...register(`familyMembers.${index}.job` as const, { required: !isDead ? 'Bắt buộc' : false })}
+                          {...register(`familyMembers.${index}.job` as const, { required: jobConfig.required ? 'Bắt buộc' : false })}
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                          placeholder={jobConfig.placeholder}
                         />
                         <FieldFeedback fieldPath={`familyHistory.${index}.job`} feedback={fieldFeedback[`familyHistory.${index}.job`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                       </div>
@@ -536,17 +585,19 @@ export default function FamilyHistoryForm({ initialData, onSave, onDataChange, o
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Số CCCD</label>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">{cccdConfig.label} {cccdConfig.required && '*'}</label>
                           <input
                             {...register(`familyMembers.${index}.cccd` as const, { 
+                              required: cccdConfig.required ? 'Bắt buộc' : false,
                               pattern: { value: /^[0-9]{12}$/, message: 'Phải đủ 12 số' }
                             })}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-brand-red"
+                            placeholder={cccdConfig.placeholder}
                           />
                           <FieldFeedback fieldPath={`familyHistory.${index}.cccd`} feedback={fieldFeedback[`familyHistory.${index}.cccd`]} onFeedbackChange={onFeedbackChange} isAdmin={isAdmin} />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Đảng viên ĐCSVN</label>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">{isPartyMemberConfig.label}</label>
                           <div className="mt-2">
                             <label className="inline-flex items-center">
                               <input
