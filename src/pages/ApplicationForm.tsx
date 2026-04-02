@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,9 +11,7 @@ import FamilyHistoryForm from '../components/forms/FamilyHistoryForm';
 import OtherInfoForm from '../components/forms/OtherInfoForm';
 import SelfAssessmentForm from '../components/forms/SelfAssessmentForm';
 import PrintableCV from '../components/PrintableCV';
-import { Eye, X, Download, Loader2 } from 'lucide-react';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import { Eye, X, Download, Loader2, FileText } from 'lucide-react';
 
 const STEPS = [
   'Thông tin cơ bản',
@@ -150,7 +148,7 @@ export default function ApplicationForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
-  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [downloadingWord, setDownloadingWord] = useState(false);
   const [showPreview, setShowPreview] = useState(() => {
     const searchParams = new URLSearchParams(location.search);
     return searchParams.get('preview') === 'true';
@@ -190,36 +188,94 @@ export default function ApplicationForm() {
     fetchApplication();
   }, [profile, id]);
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadWord = async () => {
     const element = document.querySelector('.printable-cv');
     if (!element) return;
     
-    setDownloadingPDF(true);
+    setDownloadingWord(true);
     try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pages = element.querySelectorAll('.pdf-page');
-      
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i] as HTMLElement;
-        const canvas = await html2canvas(page, { 
-          scale: 2, 
-          useCORS: true,
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        
-        if (i > 0) {
-          pdf.addPage();
-        }
-        
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-      }
-      
-      pdf.save(`LyLich_${formData.basicInfo?.fullName?.replace(/\s+/g, '_') || 'DangVien'}.pdf`);
+      const css = `
+        <style>
+          @page { size: A4; margin: 1.5cm; }
+          body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.5; color: #000; }
+          .pdf-page { page-break-after: always; clear: both; width: 100%; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .text-justify { text-align: justify; }
+          .font-bold { font-weight: bold; }
+          .italic { font-style: italic; }
+          .uppercase { text-transform: uppercase; }
+          .text-sm { font-size: 10pt; }
+          .text-xs { font-size: 9pt; }
+          .text-lg { font-size: 14pt; }
+          .text-xl { font-size: 16pt; }
+          .text-2xl { font-size: 18pt; }
+          .text-5xl { font-size: 36pt; }
+          .mb-1 { margin-bottom: 4px; }
+          .mb-2 { margin-bottom: 8px; }
+          .mb-4 { margin-bottom: 16px; }
+          .mb-6 { margin-bottom: 24px; }
+          .mb-10 { margin-bottom: 40px; }
+          .mb-20 { margin-bottom: 80px; }
+          .mt-4 { margin-top: 16px; }
+          .mt-10 { margin-top: 40px; }
+          .my-20 { margin-top: 80px; margin-bottom: 80px; }
+          .pl-4 { padding-left: 16px; }
+          .pl-5 { padding-left: 20px; }
+          .pr-10 { padding-right: 40px; }
+          .w-full { width: 100%; }
+          .w-1\\/2 { width: 50%; }
+          .w-1\\/4 { width: 25%; }
+          .mx-auto { margin-left: auto; margin-right: auto; }
+          .ml-auto { margin-left: auto; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          th, td { border: 1px solid black; padding: 5px; vertical-align: top; }
+          .border-b { border-bottom: 1px solid black; }
+          .border-dotted { border-bottom: 1px dotted black; }
+          .whitespace-pre-wrap { white-space: pre-wrap; }
+          .leading-loose { line-height: 2; }
+          .list-disc { list-style-type: disc; }
+          .flex { display: flex; }
+          .flex-col { flex-direction: column; }
+          .items-center { align-items: center; }
+          .justify-between { justify-content: space-between; }
+          .gap-1 { gap: 4px; }
+          .gap-4 { gap: 16px; }
+          .flex-grow { flex-grow: 1; }
+          .grid { display: grid; }
+          .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .gap-x-4 { column-gap: 16px; }
+          .gap-y-1 { row-gap: 4px; }
+          .col-span-2 { grid-column: span 2 / span 2; }
+        </style>
+      `;
+
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>Lý Lịch</title>
+          ${css}
+        </head>
+        <body>
+          ${element.innerHTML}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `LyLich_${formData.basicInfo?.fullName?.replace(/\s+/g, '_') || 'DangVien'}.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('Error generating Word doc:', error);
     } finally {
-      setDownloadingPDF(false);
+      setDownloadingWord(false);
     }
   };
 
@@ -601,19 +657,19 @@ export default function ApplicationForm() {
               <h3 className="text-lg font-bold text-gray-900">Xem trước Lý lịch (Mẫu 2-KNĐ)</h3>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={handleDownloadPDF}
-                  disabled={downloadingPDF}
+                  onClick={handleDownloadWord}
+                  disabled={downloadingWord}
                   className="flex items-center gap-2 px-4 py-2 bg-brand-red text-white rounded-lg hover:bg-brand-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
-                  {downloadingPDF ? (
+                  {downloadingWord ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Đang tạo PDF...
+                      Đang tạo file Word...
                     </>
                   ) : (
                     <>
-                      <Download className="w-4 h-4" />
-                      Tải file PDF
+                      <FileText className="w-4 h-4" />
+                      Tải file Word
                     </>
                   )}
                 </button>

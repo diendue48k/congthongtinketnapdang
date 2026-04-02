@@ -210,16 +210,24 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
 
       {/* Page 8: Sơ lược lý lịch */}
       <PageWrapper pageNum={8}>
-        <div className="flex justify-between items-start mb-10">
-          <div className="w-[3cm] h-[4cm] border border-black flex items-center justify-center text-xs">
-            {basicInfo.profilePhotoUrl ? (
-              <img src={basicInfo.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            ) : (
-              "Ảnh (3x4)"
-            )}
-          </div>
-          <h2 className="text-2xl font-bold uppercase mt-10">SƠ LƯỢC LÝ LỊCH</h2>
-        </div>
+        <table className="w-full mb-10" style={{ borderCollapse: 'collapse', border: 'none' }}>
+          <tbody>
+            <tr>
+              <td style={{ width: '3cm', border: 'none', padding: 0, verticalAlign: 'top' }}>
+                <div className="w-[3cm] h-[4cm] border border-black flex items-center justify-center text-xs text-center" style={{ width: '3cm', height: '4cm', border: '1px solid black', display: 'table-cell', verticalAlign: 'middle' }}>
+                  {basicInfo.profilePhotoUrl ? (
+                    <img src={basicInfo.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} referrerPolicy="no-referrer" />
+                  ) : (
+                    "Ảnh (3x4)"
+                  )}
+                </div>
+              </td>
+              <td style={{ border: 'none', padding: 0, verticalAlign: 'top', textAlign: 'right' }}>
+                <h2 className="text-2xl font-bold uppercase mt-10" style={{ marginTop: '40px' }}>SƠ LƯỢC LÝ LỊCH</h2>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <div className="space-y-2">
           {renderDottedLine("(1) Họ và tên khai sinh", basicInfo.fullName?.toUpperCase())}
@@ -605,12 +613,12 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
           {renderEmptyLines(4)}
         </div>
 
-        <div className="mt-10 text-right pr-10">
+        <div className="mt-10 text-right pr-10" style={{ marginTop: '40px', textAlign: 'right', paddingRight: '40px' }}>
           <p className="italic mb-2">............, ngày {format(new Date(), 'dd')} tháng {format(new Date(), 'MM')} năm {format(new Date(), 'yyyy')}</p>
-          <p className="font-bold uppercase mr-12">NGƯỜI KHAI</p>
-          <p className="italic text-sm mr-10">(Ký và ghi rõ họ tên)</p>
-          <div className="h-32"></div>
-          <p className="font-bold text-xl mr-10">{basicInfo.fullName?.toUpperCase()}</p>
+          <p className="font-bold uppercase mr-12" style={{ marginRight: '48px' }}>NGƯỜI KHAI</p>
+          <p className="italic text-sm mr-10" style={{ marginRight: '40px' }}>(Ký và ghi rõ họ tên)</p>
+          <div className="h-32" style={{ height: '128px' }}></div>
+          <p className="font-bold text-xl mr-10" style={{ marginRight: '40px' }}>{basicInfo.fullName?.toUpperCase()}</p>
         </div>
       </PageWrapper>
 
@@ -636,9 +644,9 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         <div className="space-y-6 text-sm">
           {renderEmptyLines(13)}
         </div>
-        <div className="mt-10 text-right pr-10">
+        <div className="mt-10 text-right pr-10" style={{ marginTop: '40px', textAlign: 'right', paddingRight: '40px' }}>
           <p className="italic mb-2">............, ngày.......tháng.......năm.......</p>
-          <p className="font-bold uppercase mr-12">T/M.......................................</p>
+          <p className="font-bold uppercase mr-12" style={{ marginRight: '48px' }}>T/M.......................................</p>
         </div>
       </PageWrapper>
 
@@ -649,9 +657,9 @@ const PrintableCV: React.FC<PrintableCVProps> = ({ data }) => {
         <div className="space-y-6 text-sm">
           {renderEmptyLines(13)}
         </div>
-        <div className="mt-10 text-right pr-10">
+        <div className="mt-10 text-right pr-10" style={{ marginTop: '40px', textAlign: 'right', paddingRight: '40px' }}>
           <p className="italic mb-2">............, ngày.......tháng.......năm.......</p>
-          <p className="font-bold uppercase mr-12">T/M.......................................</p>
+          <p className="font-bold uppercase mr-12" style={{ marginRight: '48px' }}>T/M.......................................</p>
         </div>
       </PageWrapper>
     </div>
