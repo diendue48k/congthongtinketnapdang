@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { handleFirestoreError, OperationType } from '../utils/firestoreError';
@@ -14,8 +14,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'dashboard';
+  const filterStatus = searchParams.get('status') || 'all';
   
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminName, setNewAdminName] = useState('');
@@ -24,6 +25,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const setFilterStatus = (status: string) => {
+    setSearchParams(prev => {
+      prev.set('status', status);
+      return prev;
+    });
+  };
 
   const fetchData = async () => {
     try {
@@ -116,8 +124,6 @@ export default function AdminDashboard() {
       alert('Lỗi khi xóa Đảng viên hướng dẫn');
     }
   };
-
-  const [filterStatus, setFilterStatus] = useState('all');
 
   const handleExport = () => {
     let dataToExport: any[] = [];
@@ -408,7 +414,7 @@ export default function AdminDashboard() {
                   filteredApplications.map((app) => (
                     <tr key={app.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-2 whitespace-nowrap">
-                        <Link to={`/application/${app.id}`} className="flex items-center gap-1.5 group cursor-pointer">
+                        <Link to={`/application/${app.id}?from=${encodeURIComponent(location.search)}`} className="flex items-center gap-1.5 group cursor-pointer">
                           <div className="w-5 h-5 rounded bg-brand-red/5 text-brand-red flex items-center justify-center font-bold text-[8px] group-hover:bg-brand-red group-hover:text-white transition-colors">
                             {(app.basicInfo?.fullName || 'S')[0]}
                           </div>

@@ -488,7 +488,12 @@ export default function ApplicationForm() {
                 )}
                 {profile?.role === 'admin' && (
                   <button 
-                    onClick={() => navigate('/')}
+                    onClick={() => {
+                      const searchParams = new URLSearchParams(location.search);
+                      const from = searchParams.get('from');
+                      const returnUrl = from ? `/${from}` : '/?tab=dashboard';
+                      navigate(returnUrl);
+                    }}
                     className="text-gray-600 hover:text-gray-900 flex items-center text-sm font-medium bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm transition-all"
                   >
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
